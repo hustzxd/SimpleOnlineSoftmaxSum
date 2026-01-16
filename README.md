@@ -59,9 +59,10 @@ Online Softmax 的过程中，每次只能看到当前的最大值 $m_t$，也�
 
 $$
 \begin{aligned}
-\text{softmax}(x_t|m_{t+1},l_{t+1})
-&= \frac{e^{x_t-m_{t+1}}}{e^{l_{t+1}}} \\
-&= \text{softmax}(x_t | m_t, l_t) e^{m_t - m_{t+1}} e^{l_t - l_{t+1}}
+scale
+&=\frac{\text{softmax}(x_t|m_{t+1},l_{t+1})}{\text{softmax}(x_t | m_t, l_t)} \\
+&= \frac{e^{x_t-m_{t+1}}}{e^{l_{t+1}}} / \frac{e^{x_t-m_{t}}}{e^{l_{t}}} \\
+&= e^{m_t - m_{t+1}} e^{l_t - l_{t+1}}
 \end{aligned}
 $$
 
@@ -120,7 +121,4 @@ python compare_softmax.py
 | 128   | 1.44e-15       | 5.15e-08    | ✓    |
 
 ## 应用场景
-
-- **注意力机制**: Transformer 中的加权求和 `Σ softmax(q·k) * v`
-- **流式数据处理**: 实时推理、增量计算
-- **内存受限场景**: 无法存储全部历史数据
+Flash Attention `softmax(q·k) * v`的实现依赖Online Softmax Sum，本项目通过最简化的方式验证了这个过程
